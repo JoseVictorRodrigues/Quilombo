@@ -1,0 +1,35 @@
+# Render infrastructure as code for Quilombo Araucária
+# After pushing this file, go to https://dashboard.render.com and import the repository.
+# Render will read this file and create a web service and a managed Postgres database.
+
+services:
+  - type: web
+    name: quilombo-araucaria-web
+    env: python
+    plan: free
+    region: oregon
+    repo: https://github.com/JoseVictorRodrigues/Quilombo.git
+    branch: main
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn quilombo_site.wsgi:application
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: quilombo_site.settings
+      - key: SECRET_KEY
+        generate: true
+      - key: ALLOWED_HOSTS
+        value: '*'
+      - key: DEBUG
+        value: 'false'
+
+databases:
+  - name: quilombo-araucaria-db
+    engine: postgresql
+    plan: free
+    version: "14"
+
+# Notes:
+# - After Render creates the Postgres database, set the environment variable DATABASE_URL
+#   in the Web Service to the connection string provided by Render (the import tool may
+#   wire this automatically).
+# - You should review and set any additional env vars (e.g., EMAIL settings) in Render dashboard.
