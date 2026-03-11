@@ -1,0 +1,30 @@
+﻿python.exe : Creating test database for alias 'default'...
+At line:1 char:72
++ ... lombo_site; & "C:\Users\monoc\Documents\Projects\Quilombo\.venv\Scrip ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Creating test d...as 'default'... 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+..............INFO 2026-03-11 04:58:12,802 views Contato recebido de 
+maria@exemplo.com
+................WARNING 2026-03-11 04:58:13,301 log Not Found: /agenda/9999/
+.......WARNING 2026-03-11 04:58:55,564 log Not Found: /posts/post-de-teste/
+..........WARNING 2026-03-11 05:01:15,708 log Not Found: /equipe/editar-post/1/
+....WARNING 2026-03-11 05:02:25,343 log Method Not Allowed (GET): 
+/equipe/excluir-post/1/
+.WARNING 2026-03-11 05:02:44,535 log Not Found: /equipe/excluir-post/1/
+..WARNING 2026-03-11 05:03:15,481 views Tentativa de login falha: user=equipe, 
+IP=127.0.0.1, tentativa=1
+...INFO 2026-03-11 05:03:56,097 views Login realizado: user=equipe, 
+IP=127.0.0.1
+....
+----------------------------------------------------------------------
+Ran 61 tests in 385.455s
+
+OK
+Destroying test database for alias 'default'...
+
+Found 61 test(s).
+System check identified no issues (0 silenced).

@@ -1,0 +1,18 @@
+Found 60 test(s).
+System check identified no issues (0 silenced).
+
+Creating test database for alias 'default'...
+
+..............INFO 2026-03-11 04:34:36,693 views Contato recebido de maria@exemplo.com
+...............WARNING 2026-03-11 04:34:37,146 log Not Found: /agenda/9999/
+.......WARNING 2026-03-11 04:35:22,744 log Not Found: /posts/post-de-teste/
+..........WARNING 2026-03-11 04:37:00,182 log Not Found: /equipe/editar-post/1/
+....WARNING 2026-03-11 04:37:56,946 log Method Not Allowed (GET): /equipe/excluir-post/1/
+.WARNING 2026-03-11 04:38:16,525 log Not Found: /equipe/excluir-post/1/
+.........
+----------------------------------------------------------------------
+Ran 60 tests in 296.889s
+
+OK
+Destroying test database for alias 'default'...
+

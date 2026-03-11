@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Quilombo Araucária - Comunidade, cultura e natureza. Espaço comunitário, cultural e ambiental aberto para participação.">
+    <title>{% block title %}Quilombo Araucária{% endblock %}</title>
+
+    <!-- Favicon dinâmico (sincronizado com a logo do site) -->
+    {% if site_config.logo %}
+    <link rel="icon" type="image/x-icon" href="{{ site_config.logo.url }}">
+    <link rel="shortcut icon" href="{{ site_config.logo.url }}">
+    <link rel="apple-touch-icon" href="{{ site_config.logo.url }}">
+    {% else %}
+    <link rel="icon" type="image/x-icon" href="{% url 'favicon' %}">
+    <link rel="shortcut icon" href="{% url 'favicon' %}">
+    {% endif %}
+
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 (ícones de acessibilidade e redes sociais) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js" defer></script>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="anonymous">
+
+    <!-- CSS do site -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Animação de folhas caindo -->
+    {% if site_config.animacao_folhas_ativa %}
+    <div id="falling-leaves" class="falling-leaves" aria-hidden="true"></div>
+    {% endif %}
+
+    <!-- Imagem de fundo configurável -->
+    {% if site_config.imagem_fundo %}
+    <div class="site-background-image" style="background-image: url('{{ site_config.imagem_fundo.url }}');" aria-hidden="true"></div>
+    {% endif %}
+
+    <!-- Skip navigation para acessibilidade -->
+    <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+
+    <!-- Painel de Acessibilidade flutuante (canto superior direito) -->
+    <div class="accessibility-panel" role="toolbar" aria-label="Ferramentas de acessibilidade">
+        <button type="button" class="a11y-btn" id="btn-increase-font" aria-label="Aumentar tamanho da fonte" title="Aumentar fonte">
+            <i class="fa-solid fa-font" aria-hidden="true"></i>
+            <span class="a11y-label">A+</span>
+        </button>
+        <button type="button" class="a11y-btn" id="btn-decrease-font" aria-label="Diminuir tamanho da fonte" title="Diminuir fonte">
+            <i class="fa-solid fa-font fa-sm" aria-hidden="true"></i>
+            <span class="a11y-label">A-</span>
+        </button>
+        <button type="button" class="a11y-btn" id="btn-toggle-contrast" aria-label="Alternar alto contraste" title="Alto contraste" aria-pressed="false">
+            <i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="a11y-btn" id="btn-toggle-theme" aria-label="Alternar tema claro/escuro" title="Alternar tema">
+            <i class="fa-solid fa-moon" id="theme-icon" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    <!-- Navegação Principal -->
+    <header class="main-header" role="banner">
+        <nav class="navbar" role="navigation" aria-label="Navegação principal">
+            <div class="nav-container-full">
+
+                <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+                    <i data-lucide="menu" aria-hidden="true"></i>
+                </button>
+
+                <ul class="nav-menu nav-menu-left" role="menubar">
+                    <li role="none"><a href="{% url 'sobre' %}" role="menuitem" class="nav-link">
+                        <i data-lucide="info" aria-hidden="true"></i> Sobre nós
+                    </a></li>
+                    <li role="none"><a href="{% url 'lista_posts' %}" role="menuitem" class="nav-link">
+                        <i data-lucide="file-text" aria-hidden="true"></i> Posts
+                    </a></li>
+                </ul>
+
+                <a href="{% url 'home' %}" class="nav-logo" aria-label="Quilombo Araucária - Página inicial">
+                    {% if site_config.logo %}
+                    <img src="{{ site_config.logo.url }}" alt="Quilombo Araucária" class="nav-logo-img">
+                    {% else %}
+                    <div class="logo-circle-small">QA</div>
+                    {% endif %}
+                </a>
+
+                <ul class="nav-menu nav-menu-right" role="menubar">
+                    <li role="none"><a href="{% url 'agenda' %}" role="menuitem" class="nav-link">
+                        <i data-lucide="calendar" aria-hidden="true"></i> Agenda
+                    </a></li>
+                    <li role="none"><a href="{% url 'contato' %}" role="menuitem" class="nav-link">
+                        <i data-lucide="mail" aria-hidden="true"></i> Contato
+                    </a></li>
+                </ul>
+
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mensagens do Django -->
+    {% if messages %}
+    <div class="messages-container" role="alert" aria-live="polite">
+        {% for message in messages %}
+        <div class="message message-{{ message.tags }}">
+            {{ message }}
+            <button type="button" class="message-close" aria-label="Fechar mensagem">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Conteúdo Principal -->
+    <main id="main-content" role="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="main-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        {% if site_config.logo %}
+                        <img src="{{ site_config.logo.url }}" alt="QA" class="footer-logo-img">
+                        {% else %}
+                        <div class="logo-circle-small">QA</div>
+                        {% endif %}
+                        <h3>Quilombo Araucária</h3>
+                    </div>
+                    <p>Comunidade, cultura e natureza. Um espaço aberto para todos que desejam construir um futuro melhor em harmonia com o meio ambiente.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'home' %}">Início</a></li>
+                        <li><a href="{% url 'sobre' %}">Sobre nós</a></li>
+                        <li><a href="{% url 'lista_posts' %}">Posts</a></li>
+                        <li><a href="{% url 'agenda' %}">Agenda</a></li>
+                        <li><a href="{% url 'contato' %}">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contato</h4>
+                    <ul class="footer-links">
+                        <li><i data-lucide="map-pin" aria-hidden="true"></i> Rua Ecaúna, 137, Umarizal, São Paulo - SP, 05754-040, Brasil</li>
+                        {% if site_config.email_contato %}
+                        <li><i data-lucide="mail" aria-hidden="true"></i> <a href="mailto:{{ site_config.email_contato }}">{{ site_config.email_contato }}</a></li>
+                        {% else %}
+                        <li><i data-lucide="mail" aria-hidden="true"></i> <a href="mailto:quilomboaraucaria@gmail.com">quilomboaraucaria@gmail.com</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Redes Sociais</h4>
+                    {% include 'components/social_links.html' %}
+                    <div class="footer-equipe">
+                        <a href="{% url 'equipe_login' %}" class="btn btn-outline-light btn-sm">
+                            <i data-lucide="users" aria-hidden="true"></i> Equipe
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Quilombo Araucária. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin="anonymous"></script>
+
+    <!-- JS do site -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

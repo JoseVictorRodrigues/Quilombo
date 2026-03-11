@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Novo Post - Equipe Quilombo Araucária{% endblock %}
+
+{% block extra_head %}
+<!-- TinyMCE Editor (self-hosted via jsDelivr - sem necessidade de API key) -->
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.5/tinymce.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1><i data-lucide="plus" aria-hidden="true"></i> Novo Post</h1>
+        <p>Crie um novo conteúdo para a comunidade</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="editor-wrapper animate-on-scroll">
+            <form method="post" enctype="multipart/form-data" class="editor-form" novalidate id="post-form">
+                {% csrf_token %}
+
+                <!-- Informações básicas -->
+                <fieldset class="editor-fieldset">
+                    <legend><i data-lucide="info" aria-hidden="true"></i> Informações Básicas</legend>
+
+                    <div class="form-group">
+                        <label for="id_titulo">
+                            <i data-lucide="type" aria-hidden="true"></i> Título *
+                        </label>
+                        {{ form.titulo }}
+                        {% if form.titulo.errors %}
+                        <div class="form-error" role="alert">{{ form.titulo.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_resumo">
+                            <i data-lucide="align-left" aria-hidden="true"></i> Resumo *
+                        </label>
+                        {{ form.resumo }}
+                        {% if form.resumo.errors %}
+                        <div class="form-error" role="alert">{{ form.resumo.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label for="id_imagem_capa">
+                                <i data-lucide="image" aria-hidden="true"></i> Imagem de capa
+                            </label>
+                            {{ form.imagem_capa }}
+                            {% if form.imagem_capa.errors %}
+                            <div class="form-error" role="alert">{{ form.imagem_capa.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label for="id_video_url">
+                                <i data-lucide="video" aria-hidden="true"></i> URL do vídeo principal (opcional)
+                            </label>
+                            {{ form.video_url }}
+                            {% if form.video_url.errors %}
+                            <div class="form-error" role="alert">{{ form.video_url.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Editor de conteúdo -->
+                <fieldset class="editor-fieldset">
+                    <legend><i data-lucide="file-text" aria-hidden="true"></i> Conteúdo</legend>
+                    <div class="form-group">
+                        {{ form.conteudo }}
+                        {% if form.conteudo.errors %}
+                        <div class="form-error" role="alert">{{ form.conteudo.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </fieldset>
+
+                <!-- Galeria de Imagens -->
+                <fieldset class="editor-fieldset">
+                    <legend><i data-lucide="images" aria-hidden="true"></i> Galeria de Imagens</legend>
+                    <p class="form-help">Selecione múltiplas imagens para adicionar ao post. Formatos: JPG, PNG, GIF, WebP. Máximo 5MB cada.</p>
+                    <div class="form-group">
+                        <input type="file" name="galeria_imagens" class="form-input" accept="image/*" multiple id="galeria-imagens-input">
+                    </div>
+                    <div id="preview-imagens" class="media-preview-grid"></div>
+                </fieldset>
+
+                <!-- Galeria de Vídeos -->
+                <fieldset class="editor-fieldset">
+                    <legend><i data-lucide="film" aria-hidden="true"></i> Galeria de Vídeos</legend>
+                    <p class="form-help">Envie vídeos (MP4, WebM, máx 100MB) ou adicione links externos (YouTube, Vimeo).</p>
+                    <div class="form-group">
+                        <label>Upload de vídeos</label>
+                        <input type="file" name="galeria_videos" class="form-input" accept="video/*" multiple id="galeria-videos-input">
+                    </div>
+                    <div class="form-group" id="video-urls-container">
+                        <label>Links de vídeos externos</label>
+                        <div class="video-url-row">
+                            <input type="url" name="video_externo_url" class="form-input" placeholder="https://www.youtube.com/watch?v=...">
+                            <button type="button" class="btn btn-sm btn-outline add-video-url-btn" title="Adicionar outro link">
+                                <i data-lucide="plus" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="editor-actions">
+                    <button type="button" class="btn btn-outline btn-lg" id="btn-preview-post">
+                        <i data-lucide="eye" aria-hidden="true"></i> Pré-visualizar
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i data-lucide="save" aria-hidden="true"></i> Publicar Post
+                    </button>
+                    <a href="{% url 'equipe_painel' %}" class="btn btn-outline">
+                        <i data-lucide="arrow-left" aria-hidden="true"></i> Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Modal de pré-visualização -->
+<div class="preview-modal" id="preview-modal" style="display:none;">
+    <div class="preview-modal-content">
+        <div class="preview-modal-header">
+            <h2>Pré-visualização do Post</h2>
+            <button type="button" class="preview-modal-close" id="close-preview">&times;</button>
+        </div>
+        <div class="preview-modal-body" id="preview-body"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar TinyMCE
+    if (typeof tinymce !== 'undefined') {
+        tinymce.init({
+            selector: '#id_conteudo',
+            base_url: 'https://cdn.jsdelivr.net/npm/tinymce@6.8.5',
+            suffix: '.min',
+            height: 500,
+            menubar: 'file edit view insert format tools table',
+            plugins: 'lists link image media table code wordcount fullscreen preview charmap anchor searchreplace visualblocks',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | table charmap | code fullscreen preview | removeformat',
+            toolbar_mode: 'sliding',
+            image_title: true,
+            automatic_uploads: true,
+            images_upload_url: '{% url "equipe_upload_imagem" %}',
+            images_upload_credentials: true,
+            file_picker_types: 'image',
+            font_family_formats: 'Nunito=Nunito,sans-serif; Playfair Display=Playfair Display,serif; Arial=arial,helvetica,sans-serif; Georgia=georgia,serif; Courier New=courier new,monospace; Verdana=verdana,sans-serif',
+            font_size_formats: '12px 14px 16px 18px 20px 24px 28px 32px 36px 48px',
+            content_style: "@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap'); body { font-family: 'Nunito', sans-serif; font-size: 16px; line-height: 1.7; max-width: 800px; margin: 0 auto; padding: 1rem; }",
+            branding: false,
+            promotion: false,
+            language: 'pt_BR',
+            language_url: 'https://cdn.jsdelivr.net/npm/tinymce-i18n@24.11.25/langs6/pt_BR.min.js',
+            media_live_embeds: true,
+            images_upload_handler: function (blobInfo, progress) {
+                return new Promise(function (resolve, reject) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '{% url "equipe_upload_imagem" %}');
+                    xhr.setRequestHeader('X-CSRFToken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+                    xhr.upload.onprogress = function (e) {
+                        progress(e.loaded / e.total * 100);
+                    };
+                    xhr.onload = function () {
+                        if (xhr.status === 200) {
+                            var json = JSON.parse(xhr.responseText);
+                            resolve(json.location);
+                        } else {
+                            reject('Upload falhou: ' + xhr.status);
+                        }
+                    };
+                    xhr.onerror = function () { reject('Upload falhou.'); };
+                    var formData = new FormData();
+                    formData.append('file', blobInfo.blob(), blobInfo.filename());
+                    xhr.send(formData);
+                });
+            },
+        });
+    }
+
+    // Preview de imagens selecionadas
+    var imgInput = document.getElementById('galeria-imagens-input');
+    var previewContainer = document.getElementById('preview-imagens');
+    if (imgInput) {
+        imgInput.addEventListener('change', function() {
+            previewContainer.innerHTML = '';
+            Array.from(this.files).forEach(function(file) {
+                if (file.type.startsWith('image/')) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var div = document.createElement('div');
+                        div.className = 'media-preview-item';
+                        div.innerHTML = '<img src="' + e.target.result + '" alt="Preview"><span class="media-preview-name">' + file.name + '</span>';
+                        previewContainer.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    }
+
+    // Adicionar campos de URL de vídeo externo
+    var container = document.getElementById('video-urls-container');
+    if (container) {
+        container.addEventListener('click', function(e) {
+            var btn = e.target.closest('.add-video-url-btn');
+            if (btn) {
+                var row = document.createElement('div');
+                row.className = 'video-url-row';
+                row.innerHTML = '<input type="url" name="video_externo_url" class="form-input" placeholder="https://www.youtube.com/watch?v=...">' +
+                    '<button type="button" class="btn btn-sm btn-outline remove-video-url-btn" title="Remover">' +
+                    '<i data-lucide="x" aria-hidden="true"></i></button>';
+                container.appendChild(row);
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+            var removeBtn = e.target.closest('.remove-video-url-btn');
+            if (removeBtn) {
+                removeBtn.closest('.video-url-row').remove();
+            }
+        });
+    }
+
+    // Pré-visualização do post
+    var previewBtn = document.getElementById('btn-preview-post');
+    var previewModal = document.getElementById('preview-modal');
+    var closeBtn = document.getElementById('close-preview');
+    var previewBody = document.getElementById('preview-body');
+    if (previewBtn && previewModal) {
+        previewBtn.addEventListener('click', function() {
+            var titulo = document.getElementById('id_titulo').value || 'Sem título';
+            var conteudo = '';
+            if (typeof tinymce !== 'undefined' && tinymce.get('id_conteudo')) {
+                conteudo = tinymce.get('id_conteudo').getContent();
+            } else {
+                conteudo = document.getElementById('id_conteudo').value;
+            }
+            previewBody.innerHTML = '<h1>' + titulo + '</h1><div class="post-detail-content">' + conteudo + '</div>';
+            previewModal.style.display = 'flex';
+        });
+        closeBtn.addEventListener('click', function() {
+            previewModal.style.display = 'none';
+        });
+        previewModal.addEventListener('click', function(e) {
+            if (e.target === previewModal) previewModal.style.display = 'none';
+        });
+    }
+});
+</script>
+{% endblock %}

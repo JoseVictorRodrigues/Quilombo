@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load youtube_tags %}
+
+{% block title %}{{ post.titulo }} - Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1>{{ post.titulo }}</h1>
+        <p>
+            <time datetime="{{ post.data_publicacao|date:'Y-m-d' }}">
+                <i data-lucide="calendar" aria-hidden="true"></i> {{ post.data_publicacao|date:'d/m/Y' }}
+            </time>
+            {% if post.autor %}
+            &nbsp;|&nbsp;
+            <i data-lucide="user" aria-hidden="true"></i> {{ post.autor.get_full_name|default:post.autor.username }}
+            {% endif %}
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <article class="post-detail animate-on-scroll">
+            {% if post.imagem_capa %}
+            <div class="post-detail-image">
+                <img src="{{ post.imagem_capa.url }}" alt="{{ post.titulo }}" loading="lazy">
+            </div>
+            {% endif %}
+
+            {% if post.video_url %}
+            <div class="post-detail-video">
+                {% with embed_url=post.video_url|youtube_embed %}
+                {% if embed_url %}
+                <div class="video-embed-responsive">
+                    <iframe src="{{ embed_url }}" width="100%" height="400" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" title="YouTube video player"></iframe>
+                </div>
+                {% else %}
+                <a href="{{ post.video_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                    <i data-lucide="play-circle" aria-hidden="true"></i> Assistir vídeo
+                </a>
+                {% endif %}
+                {% endwith %}
+            </div>
+            {% endif %}
+
+            <div class="post-detail-content">
+                {{ post.conteudo|safe }}
+            </div>
+
+            {% if midias_imagens %}
+            <div class="post-gallery">
+                <h3><i data-lucide="images" aria-hidden="true"></i> Galeria de Imagens</h3>
+                <div class="post-gallery-grid">
+                    {% for midia in midias_imagens %}
+                    {% if midia.arquivo %}
+                    <div class="post-gallery-item">
+                        <img src="{{ midia.arquivo.url }}" alt="Imagem do post" loading="lazy">
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if midias_videos %}
+            <div class="post-videos">
+                <h3><i data-lucide="film" aria-hidden="true"></i> Vídeos</h3>
+                {% for midia in midias_videos %}
+                <div class="post-video-item">
+                    {% if midia.arquivo %}
+                    <video controls preload="metadata" class="post-video-player">
+                        <source src="{{ midia.arquivo.url }}" type="video/mp4">
+                        Seu navegador não suporta vídeo.
+                    </video>
+                    {% elif midia.video_url %}
+                    {% with embed_url=midia.video_url|youtube_embed %}
+                    {% if embed_url %}
+                    <div class="video-embed-responsive">
+                        <iframe src="{{ embed_url }}" width="100%" height="400" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" title="YouTube video player"></iframe>
+                    </div>
+                    {% else %}
+                    <a href="{{ midia.video_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                        <i data-lucide="play-circle" aria-hidden="true"></i> Assistir vídeo
+                    </a>
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="post-detail-footer">
+                <a href="{% url 'lista_posts' %}" class="btn btn-outline">
+                    <i data-lucide="arrow-left" aria-hidden="true"></i> Voltar aos posts
+                </a>
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock %}

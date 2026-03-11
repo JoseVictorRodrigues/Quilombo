@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Página não encontrada - Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1><i data-lucide="search-x" aria-hidden="true"></i> Página não encontrada</h1>
+        <p>A página que você procura não existe ou foi movida.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="empty-state animate-on-scroll" style="max-width:500px;margin:0 auto;padding:60px 20px;">
+            <i data-lucide="map-off" aria-hidden="true" style="width:64px;height:64px;margin-bottom:24px;"></i>
+            <h3>Erro 404</h3>
+            <p>Esse caminho não existe no nosso quilombo. Que tal voltar para o início?</p>
+            <div style="margin-top:28px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                <a href="/" class="btn btn-primary">
+                    <i data-lucide="home" aria-hidden="true"></i> Voltar ao início
+                </a>
+                <a href="/contato/" class="btn btn-outline">
+                    <i data-lucide="mail" aria-hidden="true"></i> Contato
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

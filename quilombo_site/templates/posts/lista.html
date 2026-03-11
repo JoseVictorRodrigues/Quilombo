@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Posts - Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1><i data-lucide="file-text" aria-hidden="true"></i> Posts</h1>
+        <p>Novidades, artigos e histórias da nossa comunidade</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="posts-grid animate-on-scroll">
+            {% for post in posts %}
+            <article class="post-card">
+                {% if post.imagem_capa %}
+                <div class="post-card-image">
+                    <img src="{{ post.imagem_capa.url }}" alt="{{ post.titulo }}" loading="lazy">
+                </div>
+                {% else %}
+                <div class="post-card-image post-card-placeholder">
+                    <i data-lucide="image" aria-hidden="true"></i>
+                </div>
+                {% endif %}
+                <div class="post-card-body">
+                    <time class="post-card-date" datetime="{{ post.data_publicacao|date:'Y-m-d' }}">
+                        <i data-lucide="calendar" aria-hidden="true"></i> {{ post.data_publicacao|date:'d/m/Y' }}
+                    </time>
+                    <h3 class="post-card-title">{{ post.titulo }}</h3>
+                    <p class="post-card-excerpt">{{ post.resumo|truncatewords:30 }}</p>
+                    {% if post.autor %}
+                    <p class="post-card-author">
+                        <i data-lucide="user" aria-hidden="true"></i> {{ post.autor.get_full_name|default:post.autor.username }}
+                    </p>
+                    {% endif %}
+                    <a href="{% url 'detalhe_post' post.slug %}" class="btn btn-outline btn-sm">
+                        Ler mais <i data-lucide="arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state">
+                <i data-lucide="file-text" aria-hidden="true"></i>
+                <h3>Nenhum post publicado ainda</h3>
+                <p>Fique ligado! Em breve teremos novidades.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+<div class="social-links">
+    {% if site_config.link_instagram %}
+    <a href="{{ site_config.link_instagram }}" aria-label="Instagram" class="social-link" target="_blank" rel="noopener noreferrer">
+        <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+    </a>
+    {% endif %}
+    {% if site_config.link_youtube %}
+    <a href="{{ site_config.link_youtube }}" aria-label="YouTube" class="social-link" target="_blank" rel="noopener noreferrer">
+        <i class="fa-brands fa-youtube" aria-hidden="true"></i>
+    </a>
+    {% endif %}
+    {% if site_config.link_telegram %}
+    <a href="{{ site_config.link_telegram }}" aria-label="Telegram" class="social-link" target="_blank" rel="noopener noreferrer">
+        <i class="fa-brands fa-telegram" aria-hidden="true"></i>
+    </a>
+    {% endif %}
+</div>

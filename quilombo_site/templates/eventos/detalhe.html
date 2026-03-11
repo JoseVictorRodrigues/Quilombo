@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ evento.titulo }} - Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1>{{ evento.titulo }}</h1>
+        <p>
+            <i data-lucide="calendar" aria-hidden="true"></i> {{ evento.data|date:'d/m/Y' }}
+            {% if evento.hora %}&nbsp;|&nbsp;
+            <i data-lucide="clock" aria-hidden="true"></i> {{ evento.hora|time:'H:i' }}{% endif %}
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <article class="event-detail animate-on-scroll">
+            {% if evento.imagem %}
+            <div class="event-detail-image">
+                <img src="{{ evento.imagem.url }}" alt="{{ evento.titulo }}" loading="lazy">
+            </div>
+            {% endif %}
+            <div class="event-detail-meta">
+                <div class="event-meta-item">
+                    <i data-lucide="calendar" aria-hidden="true"></i>
+                    <span>{{ evento.data|date:'d/m/Y' }}</span>
+                </div>
+                {% if evento.hora %}
+                <div class="event-meta-item">
+                    <i data-lucide="clock" aria-hidden="true"></i>
+                    <span>{{ evento.hora|time:'H:i' }}</span>
+                </div>
+                {% endif %}
+                {% if evento.local %}
+                <div class="event-meta-item">
+                    <i data-lucide="map-pin" aria-hidden="true"></i>
+                    <span>{{ evento.local }}</span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="event-detail-content">
+                {{ evento.descricao|linebreaks }}
+            </div>
+            <div class="event-detail-footer">
+                <a href="{% url 'agenda' %}" class="btn btn-outline">
+                    <i data-lucide="arrow-left" aria-hidden="true"></i> Voltar à agenda
+                </a>
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Agenda - Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1><i data-lucide="calendar" aria-hidden="true"></i> Agenda</h1>
+        <p>Confira os próximos eventos e atividades da comunidade</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="agenda-layout animate-on-scroll">
+            <div class="calendar-wrapper">
+                <div id="calendar-page" role="grid" aria-label="Calendário de eventos"></div>
+            </div>
+            <div class="events-sidebar events-sidebar-full">
+                <h3><i data-lucide="clock" aria-hidden="true"></i> Próximos Eventos</h3>
+                <ul class="events-list">
+                    {% for evento in proximos_eventos %}
+                    <li class="event-item">
+                        <div class="event-date-badge">
+                            <span class="event-day">{{ evento.data|date:'d' }}</span>
+                            <span class="event-month">{{ evento.data|date:'M' }}</span>
+                        </div>
+                        <div class="event-info">
+                            <h4><a href="{% url 'detalhe_evento' evento.pk %}">{{ evento.titulo }}</a></h4>
+                            {% if evento.hora %}<p><i data-lucide="clock" aria-hidden="true"></i> {{ evento.hora|time:'H:i' }}</p>{% endif %}
+                            {% if evento.local %}<p><i data-lucide="map-pin" aria-hidden="true"></i> {{ evento.local }}</p>{% endif %}
+                            {% if evento.descricao %}<p class="event-desc">{{ evento.descricao|truncatewords:20 }}</p>{% endif %}
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="empty-state-sm">
+                        <i data-lucide="calendar-x" aria-hidden="true"></i>
+                        <p>Nenhum evento agendado no momento.</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof initCalendar === 'function') {
+            initCalendar('calendar-page');
+        }
+    });
+</script>
+{% endblock %}

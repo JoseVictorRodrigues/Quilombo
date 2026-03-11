@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quilombo Araucária - Comunidade, Cultura e Natureza{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero" aria-label="Apresentação do Quilombo Araucária">
+    <div class="hero-overlay"></div>
+    <div class="hero-content animate-on-scroll">
+        <div class="logo-circle" aria-hidden="true">
+            {% if site_config.logo %}
+            <img src="{{ site_config.logo.url }}" alt="Quilombo Araucária" class="hero-logo-img">
+            {% else %}
+            <span class="logo-text">QA</span>
+            {% endif %}
+        </div>
+        <h1 class="hero-title">Quilombo Araucária</h1>
+        <p class="hero-subtitle">Comunidade, cultura e natureza, construindo juntos um espaço de vida, aprendizado e respeito ao meio ambiente.</p>
+        <div class="hero-cta">
+            <a href="#reuniao" class="btn btn-primary btn-lg">
+                <i data-lucide="users" aria-hidden="true"></i> Participar da Reunião
+            </a>
+            <p class="hero-cta-sub">Toda semana às <strong>14h</strong>, venha fazer parte!</p>
+        </div>
+    </div>
+    <div class="hero-scroll-indicator" aria-hidden="true">
+        <i data-lucide="chevron-down"></i>
+    </div>
+</section>
+
+<!-- Seção Sobre -->
+<section class="section section-about" id="sobre" aria-label="Sobre o projeto">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <h2 class="section-title"><i data-lucide="leaf" aria-hidden="true"></i> O que é o Quilombo Araucária?</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="about-content animate-on-scroll">
+            <div class="about-text">
+                <p>O <strong>Quilombo Araucária</strong> é um espaço comunitário, cultural e ambiental, aberto para toda a comunidade. Nascido do desejo de reconectar pessoas com a natureza e com a cultura local, o projeto promove atividades de educação ambiental, arte, agroecologia e convivência comunitária.</p>
+                <p>Aqui acreditamos que a transformação social começa no encontro entre pessoas, na troca de saberes e no respeito ao meio ambiente. Nosso espaço é de todos: venha plantar, aprender, criar e compartilhar.</p>
+            </div>
+            <div class="about-features">
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="sprout" aria-hidden="true"></i></div>
+                    <h3>Agroecologia</h3>
+                    <p>Horta comunitária e práticas sustentáveis de cultivo.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="palette" aria-hidden="true"></i></div>
+                    <h3>Cultura</h3>
+                    <p>Oficinas de arte, música, teatro e expressão cultural.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="heart-handshake" aria-hidden="true"></i></div>
+                    <h3>Comunidade</h3>
+                    <p>Encontros, mutirões e ações coletivas para o bem comum.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Seção Posts Recentes -->
+<section class="section section-posts" aria-label="Posts recentes">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <h2 class="section-title"><i data-lucide="file-text" aria-hidden="true"></i> Posts Recentes</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="posts-grid animate-on-scroll">
+            {% for post in posts_recentes %}
+            <article class="post-card">
+                {% if post.imagem_capa %}
+                <div class="post-card-image">
+                    <img src="{{ post.imagem_capa.url }}" alt="{{ post.titulo }}" loading="lazy">
+                </div>
+                {% else %}
+                <div class="post-card-image post-card-placeholder">
+                    <i data-lucide="image" aria-hidden="true"></i>
+                </div>
+                {% endif %}
+                <div class="post-card-body">
+                    <time class="post-card-date" datetime="{{ post.data_publicacao|date:'Y-m-d' }}">
+                        <i data-lucide="calendar" aria-hidden="true"></i> {{ post.data_publicacao|date:'d/m/Y' }}
+                    </time>
+                    <h3 class="post-card-title">{{ post.titulo }}</h3>
+                    <p class="post-card-excerpt">{{ post.resumo|truncatewords:25 }}</p>
+                    <a href="{% url 'detalhe_post' post.slug %}" class="btn btn-outline btn-sm">
+                        Ler mais <i data-lucide="arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state">
+                <i data-lucide="file-text" aria-hidden="true"></i>
+                <p>Nenhum post publicado ainda. Fique ligado!</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% if posts_recentes %}
+        <div class="section-cta animate-on-scroll">
+            <a href="{% url 'lista_posts' %}" class="btn btn-primary">Ver todos os posts</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Seção Agenda -->
+<section class="section section-agenda" id="reuniao" aria-label="Agenda de eventos">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <h2 class="section-title"><i data-lucide="calendar" aria-hidden="true"></i> Agenda</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="agenda-layout animate-on-scroll">
+            <div class="calendar-wrapper">
+                <div id="calendar" role="grid" aria-label="Calendário de eventos"></div>
+            </div>
+            <div class="events-sidebar">
+                <h3><i data-lucide="clock" aria-hidden="true"></i> Próximos Eventos</h3>
+                <ul class="events-list">
+                    {% for evento in proximos_eventos %}
+                    <li class="event-item">
+                        <div class="event-date-badge">
+                            <span class="event-day">{{ evento.data|date:'d' }}</span>
+                            <span class="event-month">{{ evento.data|date:'M' }}</span>
+                        </div>
+                        <div class="event-info">
+                            <h4>{{ evento.titulo }}</h4>
+                            <p><i data-lucide="clock" aria-hidden="true"></i> {{ evento.hora|time:'H:i' }}</p>
+                            <p><i data-lucide="map-pin" aria-hidden="true"></i> {{ evento.local }}</p>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="empty-state-sm">
+                        <p>Nenhum evento agendado.</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <a href="{% url 'agenda' %}" class="btn btn-outline btn-sm">Ver agenda completa</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Seção Mapa -->
+<section class="section section-map" aria-label="Mapa do espaço comunitário">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <h2 class="section-title"><i data-lucide="map" aria-hidden="true"></i> Nosso Espaço</h2>
+            <div class="section-divider"></div>
+            <p class="section-subtitle">Conheça os pontos importantes do nosso espaço comunitário</p>
+        </div>
+        <div class="map-container animate-on-scroll">
+            <div id="map" role="application" aria-label="Mapa interativo do espaço comunitário"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Pontos do mapa como JSON para o JavaScript -->
+<script type="application/json" id="map-points-data">
+[{% for ponto in pontos_mapa %}{"nome": "{{ ponto.nome|escapejs }}", "descricao": "{{ ponto.descricao|escapejs }}", "lat": {{ ponto.latitude }}, "lng": {{ ponto.longitude }}, "icone": "{{ ponto.icone|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]
+</script>
+
+<!-- Seção Convite -->
+<section class="section section-invite" aria-label="Convite para participar">
+    <div class="container">
+        <div class="invite-content animate-on-scroll">
+            <i data-lucide="trees" aria-hidden="true" class="invite-icon"></i>
+            <h2>Venha fazer parte!</h2>
+            <p>O Quilombo Araucária é um espaço de todos. Venha conhecer, participar das atividades, trazer suas ideias e ajudar a construir uma comunidade mais forte, criativa e conectada com a natureza.</p>
+            <div class="invite-actions">
+                <a href="{% url 'contato' %}" class="btn btn-primary btn-lg">
+                    <i data-lucide="mail" aria-hidden="true"></i> Entre em contato
+                </a>
+                <a href="{% url 'agenda' %}" class="btn btn-outline-light btn-lg">
+                    <i data-lucide="calendar" aria-hidden="true"></i> Veja a agenda
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Inicializar mapa na home
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof initMap === 'function') {
+            const dataEl = document.getElementById('map-points-data');
+            let points = [];
+            if (dataEl) {
+                try { points = JSON.parse(dataEl.textContent); } catch(e) {}
+            }
+            // Localização: Rua Ecaúna, 137, Umarizal, São Paulo - SP
+            initMap('map', -23.6513, -46.7490, points);
+        }
+    });
+</script>
+{% endblock %}

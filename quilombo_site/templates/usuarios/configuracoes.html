@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}Configurações do Site - Equipe Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1><i data-lucide="settings" aria-hidden="true"></i> Configurações do Site</h1>
+        <p>Gerencie a aparência e as integrações do site</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="config-wrapper animate-on-scroll">
+            <form method="post" enctype="multipart/form-data" class="config-form" novalidate>
+                {% csrf_token %}
+
+                <!-- Logo -->
+                <div class="config-section">
+                    <h3><i data-lucide="image" aria-hidden="true"></i> Logo</h3>
+                    <div class="form-group">
+                        <label for="id_logo">Logo do site</label>
+                        {% if config.logo %}
+                        <div class="current-image">
+                            <img src="{{ config.logo.url }}" alt="Logo atual">
+                        </div>
+                        {% endif %}
+                        {{ form.logo }}
+                        <p class="help-text">Logo circular exibida no topo e hero. Recomendado: 200x200px.</p>
+                        {% if form.logo.errors %}
+                        <div class="form-error" role="alert">{{ form.logo.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_tamanho_logo">
+                            <i data-lucide="maximize-2" aria-hidden="true"></i> Tamanho do logo (px)
+                        </label>
+                        {{ form.tamanho_logo }}
+                        <p class="help-text">Tamanho em pixels do logo no hero. Padrão: 120.</p>
+                        {% if form.tamanho_logo.errors %}
+                        <div class="form-error" role="alert">{{ form.tamanho_logo.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Aparência -->
+                <div class="config-section">
+                    <h3><i data-lucide="palette" aria-hidden="true"></i> Aparência</h3>
+                    <div class="form-group">
+                        <label for="id_imagem_fundo">Imagem de fundo</label>
+                        {% if config.imagem_fundo %}
+                        <div class="current-image">
+                            <img src="{{ config.imagem_fundo.url }}" alt="Fundo atual">
+                        </div>
+                        {% endif %}
+                        {{ form.imagem_fundo }}
+                        <p class="help-text">Imagem de fundo com overlay semi-transparente.</p>
+                        {% if form.imagem_fundo.errors %}
+                        <div class="form-error" role="alert">{{ form.imagem_fundo.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_cor_fundo">
+                            <i data-lucide="droplet" aria-hidden="true"></i> Cor de fundo
+                        </label>
+                        {{ form.cor_fundo }}
+                        <p class="help-text">Cor de fundo usada se não houver imagem.</p>
+                        {% if form.cor_fundo.errors %}
+                        <div class="form-error" role="alert">{{ form.cor_fundo.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <div class="form-checkbox-wrapper">
+                            {{ form.animacao_folhas_ativa }}
+                            <label for="id_animacao_folhas_ativa">
+                                <i data-lucide="leaf" aria-hidden="true"></i> Animação de folhas caindo ativa
+                            </label>
+                        </div>
+                        {% if form.animacao_folhas_ativa.errors %}
+                        <div class="form-error" role="alert">{{ form.animacao_folhas_ativa.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Contato -->
+                <div class="config-section">
+                    <h3><i data-lucide="mail" aria-hidden="true"></i> Contato</h3>
+                    <div class="form-group">
+                        <label for="id_email_contato">
+                            <i data-lucide="at-sign" aria-hidden="true"></i> E-mail de contato
+                        </label>
+                        {{ form.email_contato }}
+                        <p class="help-text">E-mail exibido no rodapé e na página de contato. Deixe vazio para usar o padrão.</p>
+                        {% if form.email_contato.errors %}
+                        <div class="form-error" role="alert">{{ form.email_contato.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Redes Sociais -->
+                <div class="config-section">
+                    <h3><i data-lucide="share-2" aria-hidden="true"></i> Redes Sociais</h3>
+                    <div class="form-group">
+                        <label for="id_link_instagram">
+                            <i data-lucide="instagram" aria-hidden="true"></i> Instagram
+                        </label>
+                        {{ form.link_instagram }}
+                        {% if form.link_instagram.errors %}
+                        <div class="form-error" role="alert">{{ form.link_instagram.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_link_telegram">
+                            <i data-lucide="send" aria-hidden="true"></i> Telegram
+                        </label>
+                        {{ form.link_telegram }}
+                        {% if form.link_telegram.errors %}
+                        <div class="form-error" role="alert">{{ form.link_telegram.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_link_youtube">
+                            <i data-lucide="youtube" aria-hidden="true"></i> YouTube
+                        </label>
+                        {{ form.link_youtube }}
+                        {% if form.link_youtube.errors %}
+                        <div class="form-error" role="alert">{{ form.link_youtube.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Integrações -->
+                <div class="config-section">
+                    <h3><i data-lucide="calendar" aria-hidden="true"></i> Integrações</h3>
+                    <div class="form-group">
+                        <label for="id_google_calendar_link">
+                            <i data-lucide="calendar" aria-hidden="true"></i> Google Calendar
+                        </label>
+                        {{ form.google_calendar_link }}
+                        <p class="help-text">URL pública do Google Calendar para sincronização de eventos.</p>
+                        {% if form.google_calendar_link.errors %}
+                        <div class="form-error" role="alert">{{ form.google_calendar_link.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="editor-actions">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i data-lucide="save" aria-hidden="true"></i> Salvar Configurações
+                    </button>
+                    <a href="{% url 'equipe_painel' %}" class="btn btn-outline">
+                        <i data-lucide="arrow-left" aria-hidden="true"></i> Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

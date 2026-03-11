@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Contato - Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1><i data-lucide="mail" aria-hidden="true"></i> Contato</h1>
+        <p>Entre em contato conosco. Ficaremos felizes em ouvir você!</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="contact-layout animate-on-scroll">
+            <div class="contact-form-wrapper">
+                <h2>Envie sua mensagem</h2>
+                <form method="post" action="{% url 'contato' %}" class="contact-form" novalidate>
+                    {% csrf_token %}
+                    {{ form.website }}
+
+                    <div class="form-group">
+                        <label for="id_nome">
+                            <i data-lucide="user" aria-hidden="true"></i> Nome
+                        </label>
+                        {{ form.nome }}
+                        {% if form.nome.errors %}
+                        <div class="form-error" role="alert">{{ form.nome.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_email">
+                            <i data-lucide="mail" aria-hidden="true"></i> E-mail
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="form-error" role="alert">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_mensagem">
+                            <i data-lucide="message-square" aria-hidden="true"></i> Mensagem
+                        </label>
+                        {{ form.mensagem }}
+                        {% if form.mensagem.errors %}
+                        <div class="form-error" role="alert">{{ form.mensagem.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg btn-full">
+                        <i data-lucide="send" aria-hidden="true"></i> Enviar Mensagem
+                    </button>
+                </form>
+            </div>
+            <div class="contact-info-wrapper">
+                <h2>Informações</h2>
+                <div class="contact-info-card">
+                    <div class="contact-info-item">
+                        <i data-lucide="map-pin" aria-hidden="true"></i>
+                        <div>
+                            <h4>Localização</h4>
+                            <p>Rua Ecaúna, 137, Umarizal<br>São Paulo - SP, 05754-040, Brasil</p>
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <i data-lucide="mail" aria-hidden="true"></i>
+                        <div>
+                            <h4>E-mail</h4>
+                            {% if site_config.email_contato %}
+                            <p><a href="mailto:{{ site_config.email_contato }}">{{ site_config.email_contato }}</a></p>
+                            {% else %}
+                            <p><a href="mailto:quilomboaraucaria@gmail.com">quilomboaraucaria@gmail.com</a></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <i data-lucide="clock" aria-hidden="true"></i>
+                        <div>
+                            <h4>Reuniões</h4>
+                            <p>Toda semana às 14h</p>
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <i data-lucide="users" aria-hidden="true"></i>
+                        <div>
+                            <h4>Participação</h4>
+                            <p>Aberto a toda comunidade</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-social-section">
+                    <h4><i data-lucide="share-2" aria-hidden="true"></i> Redes Sociais</h4>
+                    {% include 'components/social_links.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
