@@ -13,7 +13,9 @@ import bleach
 from apps.posts.models import Post, MediaPost
 from apps.posts.utils import processar_youtube_no_conteudo, validar_iframes
 from apps.core.models import ConfiguracaoSite
-from .forms import PostForm, ConfiguracaoSiteForm
+from apps.core.models import FotoGaleria
+from apps.eventos.models import Evento
+from .forms import PostForm, ConfiguracaoSiteForm, EventoForm, FotoGaleriaForm
 
 logger = logging.getLogger('django.security')
 
@@ -101,7 +103,8 @@ def equipe_logout(request):
 @login_required
 def equipe_painel(request):
     posts = Post.objects.filter(autor=request.user).order_by('-data_publicacao')
-    return render(request, 'usuarios/painel.html', {'posts': posts})
+    eventos = Evento.objects.order_by('data')
+    return render(request, 'usuarios/painel.html', {'posts': posts, 'eventos': eventos})
 
 
 @login_required
@@ -228,3 +231,94 @@ def equipe_configuracoes(request):
     else:
         form = ConfiguracaoSiteForm(instance=config)
     return render(request, 'usuarios/configuracoes.html', {'form': form, 'config': config})
+
+
+@login_required
+def equipe_criar_evento(request):
+    if request.method == 'POST':
+        form = EventoForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Evento criado com sucesso!')
+            return redirect('equipe_painel')
+    else:
+        form = EventoForm()
+    return render(request, 'usuarios/criar_evento.html', {'form': form})
+
+
+@login_required
+def equipe_editar_evento(request, pk):
+    evento = get_object_or_404(Evento, pk=pk)
+    if request.method == 'POST':
+        form = EventoForm(request.POST, request.FILES, instance=evento)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Evento atualizado com sucesso!')
+            return redirect('equipe_painel')
+    else:
+        form = EventoForm(instance=evento)
+    return render(request, 'usuarios/editar_evento.html', {'form': form, 'evento': evento})
+
+
+@login_required
+@require_POST
+def equipe_excluir_evento(request, pk):
+    evento = get_object_or_404(Evento, pk=pk)
+    evento.delete()
+    messages.success(request, 'Evento excluído com sucesso!')
+    return redirect('equipe_painel')
+
+
+@login_required
+def equipe_galeria(request):
+    fotos = FotoGaleria.objects.all()
+    return render(request, 'usuarios/galeria.html', {'fotos': fotos})
+
+
+@login_required
+def equipe_criar_foto(request):
+    if request.method == 'POST':
+        form = FotoGaleriaForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Foto adicionada com sucesso!')
+            return redirect('equipe_galeria')
+    else:
+        form = FotoGaleriaForm()
+    return render(request, 'usuarios/criar_foto.html', {'form': form})
+
+
+@login_required
+def equipe_editar_foto(request, pk):
+    foto = get_object_or_404(FotoGaleria, pk=pk)
+    if request.method == 'POST':
+        form = FotoGaleriaForm(request.POST, request.FILES, instance=foto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Foto atualizada com sucesso!')
+            return redirect('equipe_galeria')
+    else:
+        form = FotoGaleriaForm(instance=foto)
+    return render(request, 'usuarios/editar_foto.html', {'form': form, 'foto': foto})
+
+
+@login_required
+@require_POST
+def equipe_excluir_foto(request, pk):
+    foto = get_object_or_404(FotoGaleria, pk=pk)
+    foto.delete()
+    messages.success(request, 'Foto excluída com sucesso!')
+    return redirect('equipe_galeria')
+
+
+@login_required
+@require_POST
+def equipe_reordenar_fotos(request):
+    import json
+    try:
+        dados = json.loads(request.body)
+        for item in dados.get('ordem', []):
+            FotoGaleria.objects.filter(pk=item['id']).update(ordem=item['ordem'])
+        return JsonResponse({'ok': True})
+    except (json.JSONDecodeError, KeyError):
+        return JsonResponse({'error': 'Dados inválidos'}, status=400)

@@ -79,6 +79,13 @@ class ConfiguracaoSite(models.Model):
         default=True,
         help_text='Ativa ou desativa a animação de folhas caindo no site.'
     )
+    menu_posicao = models.CharField(
+        'Posição do menu',
+        max_length=10,
+        choices=[('topo', 'Horizontal (topo)'), ('lateral', 'Vertical (lateral esquerda)')],
+        default='lateral',
+        help_text='Define se o menu é exibido no topo (horizontal) ou na lateral esquerda (vertical).',
+    )
 
     class Meta:
         verbose_name = 'Configuração do Site'
@@ -132,3 +139,23 @@ class PontoMapa(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class FotoGaleria(models.Model):
+    imagem = models.ImageField(
+        'Imagem',
+        upload_to='galeria/',
+        validators=[validar_imagem],
+    )
+    titulo = models.CharField('Título', max_length=200, blank=True, default='')
+    descricao = models.CharField('Descrição', max_length=500, blank=True, default='')
+    ordem = models.PositiveIntegerField('Ordem', default=0, db_index=True)
+    criado_em = models.DateTimeField('Adicionada em', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Foto da Galeria'
+        verbose_name_plural = 'Fotos da Galeria'
+        ordering = ['ordem', '-criado_em']
+
+    def __str__(self):
+        return self.titulo or f'Foto #{self.pk}'

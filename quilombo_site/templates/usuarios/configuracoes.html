@@ -78,8 +78,35 @@
                                 <i data-lucide="leaf" aria-hidden="true"></i> Animação de folhas caindo ativa
                             </label>
                         </div>
+                        <p class="help-text">Visitantes podem pausar individualmente via botão de acessibilidade.</p>
                         {% if form.animacao_folhas_ativa.errors %}
                         <div class="form-error" role="alert">{{ form.animacao_folhas_ativa.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i data-lucide="layout" aria-hidden="true"></i> Posição do menu
+                        </label>
+                        <div class="menu-posicao-options">
+                            {% for radio in form.menu_posicao %}
+                            <label class="menu-posicao-label">
+                                {{ radio.tag }}
+                                <span class="menu-posicao-card">
+                                    {% if radio.choice_value == 'topo' %}
+                                    <i data-lucide="align-horizontal-distribute-center" aria-hidden="true"></i>
+                                    <strong>Horizontal (topo)</strong>
+                                    <small>Menu fixo no topo da página</small>
+                                    {% else %}
+                                    <i data-lucide="panel-right" aria-hidden="true"></i>
+                                    <strong>Vertical (lateral esquerda)</strong>
+                                    <small>Menu fixo na lateral esquerda</small>
+                                    {% endif %}
+                                </span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        {% if form.menu_posicao.errors %}
+                        <div class="form-error" role="alert">{{ form.menu_posicao.errors.0 }}</div>
                         {% endif %}
                     </div>
                 </div>

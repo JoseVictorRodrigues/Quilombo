@@ -16,6 +16,7 @@ class Evento(models.Model):
         null=True,
         validators=[validar_imagem]
     )
+    link_opcional = models.URLField('Link opcional', blank=True, default='')
     google_event_id = models.CharField(
         'ID do Google Calendar',
         max_length=512,

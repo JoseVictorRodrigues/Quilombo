@@ -6,7 +6,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.cache import cache_page
 from apps.posts.models import Post
 from apps.eventos.models import Evento
-from .models import PontoMapa
+from .models import PontoMapa, ConfiguracaoSite, FotoGaleria
 from .forms import ContatoForm
 
 logger = logging.getLogger('django.security')
@@ -63,11 +63,26 @@ def eventos_api(request):
     return JsonResponse(eventos_list, safe=False)
 
 
+@cache_page(60 * 5)
+def api_configuracoes_menu(request):
+    """API JSON com configuração de posição do menu e animação."""
+    config = ConfiguracaoSite.get()
+    return JsonResponse({
+        'posicao': config.menu_posicao,
+        'animacao_folhas': config.animacao_folhas_ativa,
+    })
+
+
+def galeria_fotos(request):
+    fotos = FotoGaleria.objects.all()
+    return render(request, 'core/galeria.html', {'fotos': fotos})
+
+
 def robots_txt(request):
     """Retorna o arquivo robots.txt para controle de indexação por crawlers."""
     lines = [
         'User-agent: *',
-        'Disallow: /admin/',
+        'Disallow: /painel-equipe/',
         'Disallow: /equipe/',
         'Allow: /',
         '',

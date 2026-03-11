@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Foto - Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1><i data-lucide="image" aria-hidden="true"></i> Editar Foto</h1>
+        <p>{{ foto.titulo|default:'Foto da galeria' }}</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="form-card animate-on-scroll">
+            {% if foto.imagem %}
+            <div class="foto-preview" style="margin-bottom:1.5rem; text-align:center;">
+                <img src="{{ foto.imagem.url }}" alt="{{ foto.titulo|default:'Preview' }}" style="max-width:300px; border-radius:var(--radius-md); box-shadow:var(--shadow-card);">
+            </div>
+            {% endif %}
+            <form method="post" enctype="multipart/form-data" class="painel-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_imagem" class="form-label">Imagem</label>
+                    {{ form.imagem }}
+                    {% if form.imagem.errors %}<p class="form-error">{{ form.imagem.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_titulo" class="form-label">Título (opcional)</label>
+                    {{ form.titulo }}
+                    {% if form.titulo.errors %}<p class="form-error">{{ form.titulo.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_descricao" class="form-label">Descrição (opcional)</label>
+                    {{ form.descricao }}
+                    {% if form.descricao.errors %}<p class="form-error">{{ form.descricao.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_ordem" class="form-label">Ordem</label>
+                    {{ form.ordem }}
+                    {% if form.ordem.errors %}<p class="form-error">{{ form.ordem.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="check" aria-hidden="true"></i> Salvar Alterações
+                    </button>
+                    <a href="{% url 'equipe_galeria' %}" class="btn btn-outline">
+                        <i data-lucide="arrow-left" aria-hidden="true"></i> Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -26,9 +26,14 @@
                 </div>
                 {% endif %}
                 <div class="post-card-body">
-                    <time class="post-card-date" datetime="{{ post.data_publicacao|date:'Y-m-d' }}">
-                        <i data-lucide="calendar" aria-hidden="true"></i> {{ post.data_publicacao|date:'d/m/Y' }}
-                    </time>
+                    <div class="post-card-meta">
+                        <time class="post-card-date" datetime="{{ post.data_publicacao|date:'Y-m-d' }}">
+                            <i data-lucide="calendar" aria-hidden="true"></i> {{ post.data_publicacao|date:'d/m/Y' }}
+                        </time>
+                        {% if post.categoria and post.categoria != 'geral' %}
+                        <span class="categoria-tag categoria-{{ post.categoria }}">{{ post.get_categoria_display }}</span>
+                        {% endif %}
+                    </div>
                     <h3 class="post-card-title">{{ post.titulo }}</h3>
                     <p class="post-card-excerpt">{{ post.resumo|truncatewords:30 }}</p>
                     {% if post.autor %}

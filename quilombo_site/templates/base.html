@@ -36,12 +36,20 @@
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin="anonymous">
 
+    <!-- Aplicar tema salvo antes do CSS (evita flash na carga) -->
+    <script>
+        (function(){
+            var t=localStorage.getItem('qa-theme');
+            if(t==='dark') document.documentElement.setAttribute('data-theme','dark');
+        })();
+    </script>
+
     <!-- CSS do site -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260313">
 
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body data-layout="{{ site_config.menu_posicao|default:'lateral' }}">
     <!-- Animação de folhas caindo -->
     {% if site_config.animacao_folhas_ativa %}
     <div id="falling-leaves" class="falling-leaves" aria-hidden="true"></div>
@@ -65,15 +73,110 @@
             <i class="fa-solid fa-font fa-sm" aria-hidden="true"></i>
             <span class="a11y-label">A-</span>
         </button>
-        <button type="button" class="a11y-btn" id="btn-toggle-contrast" aria-label="Alternar alto contraste" title="Alto contraste" aria-pressed="false">
-            <i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i>
+        <button type="button" class="a11y-btn" id="btn-light" aria-label="Tema claro" title="Tema claro" aria-pressed="true">
+            <i class="fa-solid fa-sun" aria-hidden="true"></i>
         </button>
-        <button type="button" class="a11y-btn" id="btn-toggle-theme" aria-label="Alternar tema claro/escuro" title="Alternar tema">
-            <i class="fa-solid fa-moon" id="theme-icon" aria-hidden="true"></i>
+        <button type="button" class="a11y-btn" id="btn-dark" aria-label="Tema escuro" title="Tema escuro" aria-pressed="false">
+            <i class="fa-solid fa-moon" aria-hidden="true"></i>
         </button>
+        {% if site_config.animacao_folhas_ativa %}
+        <button type="button" class="a11y-btn" id="btn-toggle-folhas" aria-label="Pausar/retomar animação de folhas" title="Pausar folhas" aria-pressed="false">
+            <i class="fa-solid fa-leaf" id="folhas-icon" aria-hidden="true"></i>
+        </button>
+        {% endif %}
     </div>
 
     <!-- Navegação Principal -->
+    {% if site_config.menu_posicao == 'lateral' %}
+    <!-- ========== SIDEBAR ESQUERDA ========== -->
+    <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+    <aside class="quilombo-sidebar" id="quilombo-sidebar" role="navigation" aria-label="Menu lateral">
+        <div class="sidebar-brand">
+            <a href="{% url 'home' %}" class="sidebar-brand-link" aria-label="Quilombo Araucária - Página inicial">
+                {% if site_config.logo %}
+                <img src="{{ site_config.logo.url }}" alt="Quilombo Araucária" class="sidebar-logo-img">
+                {% else %}
+                <div class="sidebar-logo-placeholder">QA</div>
+                {% endif %}
+                <span class="sidebar-title">Quilombo<br>Araucária</span>
+            </a>
+            <button type="button" class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Fechar menu">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <ul class="sidebar-nav-list" role="menubar">
+                <li role="none">
+                    <a href="{% url 'home' %}" role="menuitem" class="sidebar-nav-link">
+                        <i data-lucide="home" aria-hidden="true"></i>
+                        <span>Início</span>
+                    </a>
+                </li>
+                <li role="none">
+                    <a href="{% url 'sobre' %}" role="menuitem" class="sidebar-nav-link">
+                        <i data-lucide="info" aria-hidden="true"></i>
+                        <span>Sobre Nós</span>
+                    </a>
+                </li>
+                <li role="none">
+                    <a href="{% url 'lista_posts' %}" role="menuitem" class="sidebar-nav-link">
+                        <i data-lucide="file-text" aria-hidden="true"></i>
+                        <span>Posts</span>
+                    </a>
+                </li>
+                <li role="none">
+                    <a href="{% url 'agenda' %}" role="menuitem" class="sidebar-nav-link">
+                        <i data-lucide="calendar" aria-hidden="true"></i>
+                        <span>Agenda</span>
+                    </a>
+                </li>
+                <li role="none">
+                    <a href="{% url 'galeria_fotos' %}" role="menuitem" class="sidebar-nav-link">
+                        <i data-lucide="camera" aria-hidden="true"></i>
+                        <span>Fotos</span>
+                    </a>
+                </li>
+                <li role="none">
+                    <a href="{% url 'contato' %}" role="menuitem" class="sidebar-nav-link">
+                        <i data-lucide="mail" aria-hidden="true"></i>
+                        <span>Contato</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer-nav">
+            <div class="sidebar-social">
+                {% if site_config.link_instagram %}
+                <a href="{{ site_config.link_instagram }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="sidebar-social-link">
+                    <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                {% if site_config.link_telegram %}
+                <a href="{{ site_config.link_telegram }}" target="_blank" rel="noopener noreferrer" aria-label="Telegram" class="sidebar-social-link">
+                    <i class="fa-brands fa-telegram" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                {% if site_config.link_youtube %}
+                <a href="{{ site_config.link_youtube }}" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="sidebar-social-link">
+                    <i class="fa-brands fa-youtube" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+            </div>
+            <a href="{% url 'equipe_login' %}" class="sidebar-equipe-link">
+                <i data-lucide="users" aria-hidden="true"></i>
+                <span>Área da Equipe</span>
+            </a>
+        </div>
+    </aside>
+    <!-- Topbar mobile (visível apenas em telas pequenas com sidebar) -->
+    <header class="mobile-topbar" id="mobile-topbar" role="banner">
+        <button type="button" class="sidebar-open-btn" id="sidebar-open-btn" aria-label="Abrir menu" aria-expanded="false">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
+        <a href="{% url 'home' %}" class="mobile-brand">Quilombo Araucária</a>
+    </header>
+    {% else %}
+    <!-- ========== MENU NO TOPO (horizontal) ========== -->
     <header class="main-header" role="banner">
         <nav class="navbar" role="navigation" aria-label="Navegação principal">
             <div class="nav-container-full">
@@ -103,6 +206,9 @@
                     <li role="none"><a href="{% url 'agenda' %}" role="menuitem" class="nav-link">
                         <i data-lucide="calendar" aria-hidden="true"></i> Agenda
                     </a></li>
+                    <li role="none"><a href="{% url 'galeria_fotos' %}" role="menuitem" class="nav-link">
+                        <i data-lucide="camera" aria-hidden="true"></i> Fotos
+                    </a></li>
                     <li role="none"><a href="{% url 'contato' %}" role="menuitem" class="nav-link">
                         <i data-lucide="mail" aria-hidden="true"></i> Contato
                     </a></li>
@@ -111,6 +217,7 @@
             </div>
         </nav>
     </header>
+    {% endif %}
 
     <!-- Mensagens do Django -->
     {% if messages %}
@@ -187,7 +294,7 @@
             crossorigin="anonymous"></script>
 
     <!-- JS do site -->
-    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/main.js' %}?v=20260313"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

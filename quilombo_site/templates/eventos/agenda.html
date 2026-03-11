@@ -13,45 +13,56 @@
 
 <section class="section">
     <div class="container">
-        <div class="agenda-layout animate-on-scroll">
-            <div class="calendar-wrapper">
-                <div id="calendar-page" role="grid" aria-label="Calendário de eventos"></div>
+        <div class="agenda-grid">
+            <!-- Calendário Google -->
+            <div class="gcal-wrapper animate-on-scroll">
+                <div class="gcal-embed-container">
+                    <iframe
+                        src="https://calendar.google.com/calendar/embed?src=quilomboaraucaria%40gmail.com&ctz=America%2FSao_Paulo&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&showTz=0&hl=pt_BR&mode=MONTH"
+                        title="Agenda do Quilombo Araucária"
+                        frameborder="0"
+                        scrolling="no"
+                        allowfullscreen
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <p class="form-help" style="margin-top:.75rem; text-align:center;">
+                    <i data-lucide="info" aria-hidden="true"></i>
+                    Os eventos são gerenciados pelo Google Calendar e aparecem automaticamente aqui.
+                </p>
             </div>
-            <div class="events-sidebar events-sidebar-full">
+
+            <!-- Próximos Eventos -->
+            <div class="eventos-lateral animate-on-scroll">
                 <h3><i data-lucide="clock" aria-hidden="true"></i> Próximos Eventos</h3>
-                <ul class="events-list">
+                {% if proximos_eventos %}
+                <div class="eventos-cards">
                     {% for evento in proximos_eventos %}
-                    <li class="event-item">
-                        <div class="event-date-badge">
-                            <span class="event-day">{{ evento.data|date:'d' }}</span>
-                            <span class="event-month">{{ evento.data|date:'M' }}</span>
+                    <div class="evento-card">
+                        <div class="evento-card-date">
+                            <span class="evento-card-day">{{ evento.data|date:'d' }}</span>
+                            <span class="evento-card-month">{{ evento.data|date:'M' }}</span>
                         </div>
-                        <div class="event-info">
+                        <div class="evento-card-body">
                             <h4><a href="{% url 'detalhe_evento' evento.pk %}">{{ evento.titulo }}</a></h4>
-                            {% if evento.hora %}<p><i data-lucide="clock" aria-hidden="true"></i> {{ evento.hora|time:'H:i' }}</p>{% endif %}
-                            {% if evento.local %}<p><i data-lucide="map-pin" aria-hidden="true"></i> {{ evento.local }}</p>{% endif %}
-                            {% if evento.descricao %}<p class="event-desc">{{ evento.descricao|truncatewords:20 }}</p>{% endif %}
+                            {% if evento.hora %}<p class="evento-card-info"><i data-lucide="clock" aria-hidden="true"></i> {{ evento.hora|time:'H:i' }}</p>{% endif %}
+                            {% if evento.local %}<p class="evento-card-info"><i data-lucide="map-pin" aria-hidden="true"></i> {{ evento.local }}</p>{% endif %}
+                            {% if evento.descricao %}<p class="evento-card-desc">{{ evento.descricao|truncatewords:20 }}</p>{% endif %}
+                            {% if evento.link_opcional %}
+                            <a href="{{ evento.link_opcional }}" class="evento-card-link" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" aria-hidden="true"></i> Saiba mais</a>
+                            {% endif %}
                         </div>
-                    </li>
-                    {% empty %}
-                    <li class="empty-state-sm">
-                        <i data-lucide="calendar-x" aria-hidden="true"></i>
-                        <p>Nenhum evento agendado no momento.</p>
-                    </li>
+                    </div>
                     {% endfor %}
-                </ul>
+                </div>
+                {% else %}
+                <div class="empty-state" style="padding:2rem 1rem;">
+                    <i data-lucide="calendar-x" aria-hidden="true"></i>
+                    <p>Nenhum evento próximo no momento.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof initCalendar === 'function') {
-            initCalendar('calendar-page');
-        }
-    });
-</script>
 {% endblock %}

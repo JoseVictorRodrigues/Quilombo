@@ -15,75 +15,52 @@ document.addEventListener('DOMContentLoaded', function () {
     initMessages();
     initCalendar('calendar');
     initFallingLeaves();
+    initMenuLateral();
 });
 
 
-/* ---- Acessibilidade: Tema, Contraste, Fonte ---- */
+/* ---- Acessibilidade: Tema, Fonte ---- */
 function initAccessibility() {
     var STORAGE_KEY_THEME = 'qa-theme';
-    var STORAGE_KEY_CONTRAST = 'qa-contrast';
     var STORAGE_KEY_FONT = 'qa-font-scale';
 
     // Restaurar preferências salvas
-    var savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
-    var savedContrast = localStorage.getItem(STORAGE_KEY_CONTRAST);
+    var savedTheme = localStorage.getItem(STORAGE_KEY_THEME) || 'light';
     var savedFont = localStorage.getItem(STORAGE_KEY_FONT);
 
-    if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    }
-    if (savedContrast === 'high') {
-        document.documentElement.setAttribute('data-contrast', 'high');
-    }
+    document.documentElement.setAttribute('data-theme', savedTheme);
     if (savedFont) {
         document.documentElement.style.setProperty('--font-scale', savedFont);
     }
 
-    // Atualizar ícone do botão de tema (sol/lua)
-    function updateThemeIcon() {
-        var icon = document.getElementById('theme-icon');
-        if (!icon) return;
+    // Atualizar aria-pressed nos botões sol/lua
+    function updateThemeBtns() {
         var current = document.documentElement.getAttribute('data-theme') || 'light';
-        icon.classList.remove('fa-moon', 'fa-sun');
-        icon.classList.add(current === 'dark' ? 'fa-sun' : 'fa-moon');
+        var btnLight = document.getElementById('btn-light');
+        var btnDark = document.getElementById('btn-dark');
+        if (btnLight) btnLight.setAttribute('aria-pressed', current === 'light' ? 'true' : 'false');
+        if (btnDark) btnDark.setAttribute('aria-pressed', current === 'dark' ? 'true' : 'false');
     }
 
-    // Sincronizar aria-pressed no botão de contraste
-    function updateContrastBtn() {
-        var btn = document.getElementById('btn-toggle-contrast');
-        if (!btn) return;
-        var active = document.documentElement.getAttribute('data-contrast') === 'high';
-        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-    }
+    updateThemeBtns();
 
-    updateThemeIcon();
-    updateContrastBtn();
-
-    // Tema: botão único que alterna claro/escuro
-    var btnToggleTheme = document.getElementById('btn-toggle-theme');
-    if (btnToggleTheme) {
-        btnToggleTheme.addEventListener('click', function () {
-            var current = document.documentElement.getAttribute('data-theme') || 'light';
-            var next = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem(STORAGE_KEY_THEME, next);
-            updateThemeIcon();
+    // Botão tema claro (☀️)
+    var btnLight = document.getElementById('btn-light');
+    if (btnLight) {
+        btnLight.addEventListener('click', function () {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem(STORAGE_KEY_THEME, 'light');
+            updateThemeBtns();
         });
     }
 
-    // Alto contraste
-    var btnContrast = document.getElementById('btn-toggle-contrast');
-    if (btnContrast) {
-        btnContrast.addEventListener('click', function () {
-            var current = document.documentElement.getAttribute('data-contrast');
-            if (current === 'high') {
-                document.documentElement.removeAttribute('data-contrast');
-                localStorage.removeItem(STORAGE_KEY_CONTRAST);
-            } else {
-                document.documentElement.setAttribute('data-contrast', 'high');
-                localStorage.setItem(STORAGE_KEY_CONTRAST, 'high');
-            }
-            updateContrastBtn();
+    // Botão tema escuro (🌙)
+    var btnDark = document.getElementById('btn-dark');
+    if (btnDark) {
+        btnDark.addEventListener('click', function () {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem(STORAGE_KEY_THEME, 'dark');
+            updateThemeBtns();
         });
     }
 
@@ -107,6 +84,39 @@ function initAccessibility() {
     }
     if (btnIncrease) {
         btnIncrease.addEventListener('click', function () { setFontScale(fontScale + STEP); });
+    }
+
+    // Toggle folhas caindo (persistido via localStorage)
+    var STORAGE_KEY_FOLHAS = 'qa-folhas-paused';
+    var btnFolhas = document.getElementById('btn-toggle-folhas');
+    var folhasContainer = document.getElementById('falling-leaves');
+
+    if (btnFolhas && folhasContainer) {
+        var folhasPaused = localStorage.getItem(STORAGE_KEY_FOLHAS) === 'true';
+
+        function applyFolhasState() {
+            if (folhasPaused) {
+                folhasContainer.style.display = 'none';
+                btnFolhas.setAttribute('aria-pressed', 'true');
+                btnFolhas.setAttribute('title', 'Retomar folhas');
+                var icon = document.getElementById('folhas-icon');
+                if (icon) { icon.classList.remove('fa-leaf'); icon.classList.add('fa-pause'); }
+            } else {
+                folhasContainer.style.display = '';
+                btnFolhas.setAttribute('aria-pressed', 'false');
+                btnFolhas.setAttribute('title', 'Pausar folhas');
+                var icon = document.getElementById('folhas-icon');
+                if (icon) { icon.classList.remove('fa-pause'); icon.classList.add('fa-leaf'); }
+            }
+        }
+
+        applyFolhasState();
+
+        btnFolhas.addEventListener('click', function () {
+            folhasPaused = !folhasPaused;
+            localStorage.setItem(STORAGE_KEY_FOLHAS, folhasPaused ? 'true' : 'false');
+            applyFolhasState();
+        });
     }
 }
 
@@ -409,4 +419,54 @@ function initFallingLeaves() {
     for (var i = 0; i < 4; i++) {
         setTimeout(createLeaf, i * 800);
     }
+}
+
+
+/* ---- Sidebar Lateral Esquerda (toggle mobile) ---- */
+function initMenuLateral() {
+    var sidebar = document.getElementById('quilombo-sidebar');
+    if (!sidebar) return; // Modo topo ativo, nada a fazer
+
+    var openBtn = document.getElementById('sidebar-open-btn');
+    var closeBtn = document.getElementById('sidebar-close-btn');
+    var overlay = document.getElementById('sidebar-overlay');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('active');
+        if (openBtn) openBtn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        if (openBtn) openBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+    }
+
+    if (openBtn)  openBtn.addEventListener('click', openSidebar);
+    if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+    if (overlay)  overlay.addEventListener('click', closeSidebar);
+
+    // Fechar com ESC
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && sidebar.classList.contains('open')) closeSidebar();
+    });
+
+    // Fechar ao clicar em link no mobile
+    sidebar.querySelectorAll('.sidebar-nav-link').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (window.innerWidth < 768) closeSidebar();
+        });
+    });
+
+    // Destacar link da página atual
+    var currentPath = window.location.pathname;
+    sidebar.querySelectorAll('.sidebar-nav-link').forEach(function (link) {
+        var href = link.getAttribute('href');
+        if (href && (href === currentPath || (href !== '/' && currentPath.startsWith(href)))) {
+            link.classList.add('active');
+        }
+    });
 }

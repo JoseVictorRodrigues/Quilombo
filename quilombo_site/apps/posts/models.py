@@ -50,6 +50,23 @@ class Post(models.Model):
     )
     publicado = models.BooleanField('Publicado', default=True)
 
+    CATEGORIAS = [
+        ('geral', 'Geral'),
+        ('destaque', 'Destaque'),
+        ('reuniao', 'Reunião'),
+        ('encontro', 'Encontro'),
+        ('informativo', 'Informativo'),
+        ('cultural', 'Cultural'),
+        ('ambiental', 'Ambiental'),
+    ]
+    categoria = models.CharField(
+        'Categoria',
+        max_length=20,
+        choices=CATEGORIAS,
+        default='geral',
+        help_text='Categoria visual do post.',
+    )
+
     class Meta:
         verbose_name = 'Post'
         verbose_name_plural = 'Posts'

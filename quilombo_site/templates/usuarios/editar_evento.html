@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Evento - Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1><i data-lucide="calendar-cog" aria-hidden="true"></i> Editar Evento</h1>
+        <p>{{ evento.titulo }}</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="form-card animate-on-scroll">
+            <form method="post" enctype="multipart/form-data" class="painel-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_titulo" class="form-label">Título *</label>
+                    {{ form.titulo }}
+                    {% if form.titulo.errors %}<p class="form-error">{{ form.titulo.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_descricao" class="form-label">Descrição</label>
+                    {{ form.descricao }}
+                    {% if form.descricao.errors %}<p class="form-error">{{ form.descricao.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_data" class="form-label">Data *</label>
+                        {{ form.data }}
+                        {% if form.data.errors %}<p class="form-error">{{ form.data.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_hora" class="form-label">Horário</label>
+                        {{ form.hora }}
+                        {% if form.hora.errors %}<p class="form-error">{{ form.hora.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_local" class="form-label">Local</label>
+                    {{ form.local }}
+                    {% if form.local.errors %}<p class="form-error">{{ form.local.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_link_opcional" class="form-label">Link opcional</label>
+                    {{ form.link_opcional }}
+                    {% if form.link_opcional.errors %}<p class="form-error">{{ form.link_opcional.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_imagem" class="form-label">Imagem</label>
+                    {{ form.imagem }}
+                    {% if form.imagem.errors %}<p class="form-error">{{ form.imagem.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="check" aria-hidden="true"></i> Salvar Alterações
+                    </button>
+                    <a href="{% url 'equipe_painel' %}" class="btn btn-outline">
+                        <i data-lucide="arrow-left" aria-hidden="true"></i> Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

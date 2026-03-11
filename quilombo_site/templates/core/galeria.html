@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Galeria de Fotos - Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1><i data-lucide="camera" aria-hidden="true"></i> Galeria de Fotos</h1>
+        <p>Momentos e memórias da nossa comunidade</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        {% if fotos %}
+        <div class="galeria-grid animate-on-scroll">
+            {% for foto in fotos %}
+            <div class="galeria-item" tabindex="0" role="button" aria-label="Ver foto: {{ foto.titulo|default:'Foto da galeria' }}">
+                <div class="galeria-img-wrapper">
+                    <img src="{{ foto.imagem.url }}" alt="{{ foto.titulo|default:'Foto da galeria' }}" loading="lazy">
+                    <div class="galeria-overlay">
+                        <i data-lucide="maximize-2" aria-hidden="true"></i>
+                    </div>
+                </div>
+                {% if foto.titulo or foto.descricao %}
+                <div class="galeria-caption">
+                    {% if foto.titulo %}<h4>{{ foto.titulo }}</h4>{% endif %}
+                    {% if foto.descricao %}<p>{{ foto.descricao }}</p>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Lightbox -->
+        <div class="galeria-lightbox" id="galeria-lightbox" role="dialog" aria-modal="true" aria-label="Visualizar foto" hidden>
+            <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Fechar">
+                <i data-lucide="x" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="lightbox-prev" id="lightbox-prev" aria-label="Foto anterior">
+                <i data-lucide="chevron-left" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="lightbox-next" id="lightbox-next" aria-label="Próxima foto">
+                <i data-lucide="chevron-right" aria-hidden="true"></i>
+            </button>
+            <div class="lightbox-content">
+                <img src="" alt="" id="lightbox-img">
+                <div class="lightbox-caption" id="lightbox-caption"></div>
+            </div>
+            <div class="lightbox-counter" id="lightbox-counter"></div>
+        </div>
+        {% else %}
+        <div class="empty-state animate-on-scroll">
+            <i data-lucide="image" aria-hidden="true"></i>
+            <h3>Nenhuma foto ainda</h3>
+            <p>Em breve teremos fotos incríveis da nossa comunidade!</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    const items = document.querySelectorAll('.galeria-item');
+    const lightbox = document.getElementById('galeria-lightbox');
+    if (!items.length || !lightbox) return;
+
+    const img = document.getElementById('lightbox-img');
+    const caption = document.getElementById('lightbox-caption');
+    const counter = document.getElementById('lightbox-counter');
+    let currentIndex = 0;
+
+    const fotos = Array.from(items).map(item => ({
+        src: item.querySelector('img').src,
+        alt: item.querySelector('img').alt,
+        titulo: item.querySelector('.galeria-caption h4')?.textContent || '',
+        descricao: item.querySelector('.galeria-caption p')?.textContent || ''
+    }));
+
+    function showFoto(index) {
+        currentIndex = index;
+        const foto = fotos[index];
+        img.src = foto.src;
+        img.alt = foto.alt;
+        caption.innerHTML = foto.titulo ? `<strong>${foto.titulo}</strong>` : '';
+        if (foto.descricao) caption.innerHTML += `<span>${foto.descricao}</span>`;
+        counter.textContent = `${index + 1} / ${fotos.length}`;
+    }
+
+    function openLightbox(index) {
+        showFoto(index);
+        lightbox.hidden = false;
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('active');
+        lightbox.hidden = true;
+        document.body.style.overflow = '';
+    }
+
+    items.forEach((item, i) => {
+        item.addEventListener('click', () => openLightbox(i));
+        item.addEventListener('keydown', e => { if (e.key === 'Enter') openLightbox(i); });
+    });
+
+    document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+    document.getElementById('lightbox-prev').addEventListener('click', () => {
+        showFoto((currentIndex - 1 + fotos.length) % fotos.length);
+    });
+    document.getElementById('lightbox-next').addEventListener('click', () => {
+        showFoto((currentIndex + 1) % fotos.length);
+    });
+
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+    document.addEventListener('keydown', e => {
+        if (lightbox.hidden) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') showFoto((currentIndex - 1 + fotos.length) % fotos.length);
+        if (e.key === 'ArrowRight') showFoto((currentIndex + 1) % fotos.length);
+    });
+})();
+</script>
+{% endblock %}

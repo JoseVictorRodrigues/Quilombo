@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciar Galeria - Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1><i data-lucide="images" aria-hidden="true"></i> Gerenciar Galeria</h1>
+        <p>Adicione, edite, reordene e exclua fotos</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="painel-header animate-on-scroll">
+            <div class="painel-actions">
+                <a href="{% url 'equipe_criar_foto' %}" class="btn btn-primary">
+                    <i data-lucide="plus" aria-hidden="true"></i> Nova Foto
+                </a>
+                <a href="{% url 'equipe_painel' %}" class="btn btn-outline">
+                    <i data-lucide="arrow-left" aria-hidden="true"></i> Voltar ao Painel
+                </a>
+                <a href="{% url 'galeria_fotos' %}" class="btn btn-outline" target="_blank">
+                    <i data-lucide="external-link" aria-hidden="true"></i> Ver Galeria
+                </a>
+            </div>
+        </div>
+
+        {% if fotos %}
+        <p class="form-help animate-on-scroll" style="margin-bottom:1rem;">
+            <i data-lucide="grip-vertical" aria-hidden="true"></i>
+            Arraste as fotos para reordenar. A ordem será salva automaticamente.
+        </p>
+        <div class="galeria-admin-grid animate-on-scroll" id="galeria-admin-grid">
+            {% for foto in fotos %}
+            <div class="galeria-admin-card" data-id="{{ foto.pk }}" draggable="true">
+                <div class="galeria-admin-drag">
+                    <i data-lucide="grip-vertical" aria-hidden="true"></i>
+                </div>
+                <div class="galeria-admin-thumb">
+                    <img src="{{ foto.imagem.url }}" alt="{{ foto.titulo|default:'Foto' }}" loading="lazy">
+                </div>
+                <div class="galeria-admin-info">
+                    <h4>{{ foto.titulo|default:'Sem título' }}</h4>
+                    <span class="galeria-admin-order">Ordem: {{ foto.ordem }}</span>
+                </div>
+                <div class="galeria-admin-actions">
+                    <a href="{% url 'equipe_editar_foto' foto.pk %}" class="btn btn-outline btn-sm">
+                        <i data-lucide="edit" aria-hidden="true"></i>
+                    </a>
+                    <form method="post" action="{% url 'equipe_excluir_foto' foto.pk %}" onsubmit="return confirm('Excluir esta foto?');" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i data-lucide="trash-2" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state animate-on-scroll">
+            <i data-lucide="image" aria-hidden="true"></i>
+            <h3>Nenhuma foto na galeria</h3>
+            <p>Clique em "Nova Foto" para começar a adicionar.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    const grid = document.getElementById('galeria-admin-grid');
+    if (!grid) return;
+
+    let dragSrc = null;
+
+    grid.addEventListener('dragstart', function(e) {
+        const card = e.target.closest('.galeria-admin-card');
+        if (!card) return;
+        dragSrc = card;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    });
+
+    grid.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const card = e.target.closest('.galeria-admin-card');
+        if (card && card !== dragSrc) {
+            const rect = card.getBoundingClientRect();
+            const mid = rect.top + rect.height / 2;
+            if (e.clientY < mid) {
+                grid.insertBefore(dragSrc, card);
+            } else {
+                grid.insertBefore(dragSrc, card.nextSibling);
+            }
+        }
+    });
+
+    grid.addEventListener('dragend', function(e) {
+        if (dragSrc) dragSrc.classList.remove('dragging');
+        dragSrc = null;
+        salvarOrdem();
+    });
+
+    function salvarOrdem() {
+        const cards = grid.querySelectorAll('.galeria-admin-card');
+        const ordem = Array.from(cards).map((card, i) => ({
+            id: parseInt(card.dataset.id),
+            ordem: i
+        }));
+        // Atualizar labels visuais
+        cards.forEach((card, i) => {
+            const label = card.querySelector('.galeria-admin-order');
+            if (label) label.textContent = 'Ordem: ' + i;
+        });
+        // Enviar ao servidor
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value
+            || document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='))?.split('=')[1] || '';
+        fetch('{% url "equipe_reordenar_fotos" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ ordem: ordem }),
+        });
+    }
+})();
+</script>
+{% endblock %}

@@ -18,6 +18,12 @@
                 <a href="{% url 'equipe_criar_post' %}" class="btn btn-primary">
                     <i data-lucide="plus" aria-hidden="true"></i> Novo Post
                 </a>
+                <a href="{% url 'equipe_criar_evento' %}" class="btn btn-primary">
+                    <i data-lucide="calendar-plus" aria-hidden="true"></i> Novo Evento
+                </a>
+                <a href="{% url 'equipe_galeria' %}" class="btn btn-primary">
+                    <i data-lucide="images" aria-hidden="true"></i> Galeria de Fotos
+                </a>
                 <a href="{% url 'equipe_configuracoes' %}" class="btn btn-outline">
                     <i data-lucide="settings" aria-hidden="true"></i> Configurações
                 </a>
@@ -45,8 +51,12 @@
                     </thead>
                     <tbody>
                         {% for post in posts %}
-                        <tr>
-                            <td>{{ post.titulo }}</td>
+                            <tr>
+                            <td>{{ post.titulo }}
+                                {% if post.categoria and post.categoria != 'geral' %}
+                                <span class="categoria-tag categoria-{{ post.categoria }}" style="margin-left:6px;">{{ post.get_categoria_display }}</span>
+                                {% endif %}
+                            </td>
                             <td>{{ post.data_publicacao|date:'d/m/Y' }}</td>
                             <td>
                                 {% if post.publicado %}
@@ -79,6 +89,54 @@
                 <i data-lucide="file-text" aria-hidden="true"></i>
                 <h3>Nenhum post ainda</h3>
                 <p>Crie seu primeiro post clicando no botão acima.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Seção de Eventos -->
+        <div class="painel-content animate-on-scroll" style="margin-top:2rem;">
+            <h2><i data-lucide="calendar" aria-hidden="true"></i> Eventos</h2>
+            {% if eventos %}
+            <div class="painel-table-wrapper">
+                <table class="painel-table">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Data</th>
+                            <th>Local</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for evento in eventos %}
+                        <tr>
+                            <td>{{ evento.titulo }}</td>
+                            <td>{{ evento.data|date:'d/m/Y' }}{% if evento.hora %} {{ evento.hora|time:'H:i' }}{% endif %}</td>
+                            <td>{{ evento.local|default:'-' }}</td>
+                            <td>
+                                <a href="{% url 'equipe_editar_evento' evento.pk %}" class="btn btn-outline btn-sm">
+                                    <i data-lucide="edit" aria-hidden="true"></i> Editar
+                                </a>
+                                <a href="{% url 'detalhe_evento' evento.pk %}" class="btn btn-outline btn-sm" target="_blank">
+                                    <i data-lucide="eye" aria-hidden="true"></i> Ver
+                                </a>
+                                <form method="post" action="{% url 'equipe_excluir_evento' evento.pk %}" class="delete-form" onsubmit="return confirm('Tem certeza que deseja excluir este evento?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i data-lucide="trash-2" aria-hidden="true"></i> Excluir
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i data-lucide="calendar" aria-hidden="true"></i>
+                <h3>Nenhum evento ainda</h3>
+                <p>Crie um evento clicando no botão "Novo Evento" acima.</p>
             </div>
             {% endif %}
         </div>

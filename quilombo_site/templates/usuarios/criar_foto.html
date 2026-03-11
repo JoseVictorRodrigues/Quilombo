@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Nova Foto - Quilombo Araucária{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero-sm">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+        <h1><i data-lucide="image-plus" aria-hidden="true"></i> Nova Foto</h1>
+        <p>Adicione uma foto à galeria</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="form-card animate-on-scroll">
+            <form method="post" enctype="multipart/form-data" class="painel-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_imagem" class="form-label">Imagem *</label>
+                    {{ form.imagem }}
+                    {% if form.imagem.errors %}<p class="form-error">{{ form.imagem.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_titulo" class="form-label">Título (opcional)</label>
+                    {{ form.titulo }}
+                    {% if form.titulo.errors %}<p class="form-error">{{ form.titulo.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_descricao" class="form-label">Descrição (opcional)</label>
+                    {{ form.descricao }}
+                    {% if form.descricao.errors %}<p class="form-error">{{ form.descricao.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_ordem" class="form-label">Ordem</label>
+                    {{ form.ordem }}
+                    <p class="form-help">Número que define a posição na galeria. Menor = aparece primeiro.</p>
+                    {% if form.ordem.errors %}<p class="form-error">{{ form.ordem.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="check" aria-hidden="true"></i> Adicionar Foto
+                    </button>
+                    <a href="{% url 'equipe_galeria' %}" class="btn btn-outline">
+                        <i data-lucide="arrow-left" aria-hidden="true"></i> Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

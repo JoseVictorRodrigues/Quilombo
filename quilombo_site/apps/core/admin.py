@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Contato, PontoMapa, ConfiguracaoSite
+from .models import Contato, PontoMapa, ConfiguracaoSite, FotoGaleria
 
 
 @admin.register(ConfiguracaoSite)
@@ -10,7 +10,7 @@ class ConfiguracaoSiteAdmin(admin.ModelAdmin):
             'fields': ('logo', 'tamanho_logo'),
         }),
         ('Aparência', {
-            'fields': ('imagem_fundo', 'cor_fundo', 'animacao_folhas_ativa'),
+            'fields': ('imagem_fundo', 'cor_fundo', 'animacao_folhas_ativa', 'menu_posicao'),
         }),
         ('Redes Sociais', {
             'fields': ('link_instagram', 'link_telegram', 'link_youtube'),
@@ -46,3 +46,10 @@ class ContatoAdmin(admin.ModelAdmin):
 class PontoMapaAdmin(admin.ModelAdmin):
     list_display = ('nome', 'latitude', 'longitude', 'icone')
     search_fields = ('nome',)
+
+
+@admin.register(FotoGaleria)
+class FotoGaleriaAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'ordem', 'criado_em')
+    list_editable = ('ordem',)
+    search_fields = ('titulo', 'descricao')
